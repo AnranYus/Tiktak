@@ -2,6 +2,8 @@ package com.anyus.gateway.filter;
 
 import com.anryus.common.entity.Rest;
 import com.anryus.common.utils.JwtUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -10,10 +12,12 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -64,9 +68,16 @@ public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> {
         ServerHttpResponse response = exchange.getResponse();
         DataBufferFactory dataBufferFactory = response.bufferFactory();
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        response.getHeaders().add("Content-Type", "application/json");
-        DataBuffer wrap = dataBufferFactory.wrap(rest.toString().getBytes());
-        return response.writeWith(Mono.just(wrap));
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        ObjectMapper mapper = new ObjectMapper();
+        byte[] data = new byte[0];
+        try {
+            data = mapper.writeValueAsBytes(rest);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        Flux<DataBuffer> body = Flux.just(dataBufferFactory.wrap(data));
+        return response.writeWith(Mono.just(body).block());
     }
 
 }
