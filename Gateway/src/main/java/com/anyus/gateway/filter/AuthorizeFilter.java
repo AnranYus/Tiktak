@@ -27,8 +27,13 @@ import java.util.concurrent.atomic.AtomicReference;
 @Component
 public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> {
 
-    @Autowired
+    final
     JwtUtils jwtUtils;
+
+    public AuthorizeFilter(JwtUtils jwtUtils) {
+        this.jwtUtils = jwtUtils;
+    }
+
     @Override
     public GatewayFilter apply(Object config) {
         return (exchange, chain) -> {
