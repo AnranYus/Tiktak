@@ -2,12 +2,13 @@ package com.anyus.gateway.filter;
 
 import com.anryus.common.entity.Rest;
 import com.anryus.common.utils.JwtUtils;
-import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> {
@@ -28,17 +30,30 @@ public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> {
         return (exchange, chain) -> {
             //检查是否拥有token
             ServerHttpRequest request = exchange.getRequest();
-            String token = request.getQueryParams().getFirst("token");
-            if (token != null && !Objects.equals(token, "")){
-                Map<String, String> verify = jwtUtils.verify(token);
-                String uid = verify.get("uid");
-                String rule = verify.get("rule");
+            HttpMethod method = request.getMethod();
+            AtomicReference<String> token = new AtomicReference<>();
 
-                if (uid != null && rule != null){
-                    //TODO 暂时的不做角色鉴权,因为客户端没有提供管理员角色
-                   return   chain.filter(exchange);
+            if (method == HttpMethod.GET){
+                token.set(request.getQueryParams().getFirst("token"));
+
+                if (token.get() != null && !Objects.equals(token.get(), "")){
+                    Map<String, String> verify = jwtUtils.verify(token.get());
+                    String uid = verify.get("uid");
+                    String rule = verify.get("rule");
+
+                    if (uid != null && rule != null){
+                        //TODO 暂时的不做角色鉴权,因为客户端没有提供管理员角色
+                        return   chain.filter(exchange);
+                    }
                 }
             }
+
+            if (method == HttpMethod.POST){
+                //TODO 暂时无法从Body中获取token，需要新的解决方案
+                return   chain.filter(exchange);
+            }
+
+
 
             return doReject(exchange);
         };
