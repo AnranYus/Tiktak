@@ -20,7 +20,9 @@ public class UserService {
 
     public User getUserByUid(long uid){
         User user = userMapper.selectById(uid);
-        user.setPassword(null);
+        if (user != null){
+            user.setPassword(null);
+        }
         return user;
 
     }
