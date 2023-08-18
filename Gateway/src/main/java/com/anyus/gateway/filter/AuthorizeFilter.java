@@ -41,22 +41,6 @@ public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> {
             }
 
             return doReject(exchange);
-//            MultiValueMap<String, HttpCookie> cookies = request.getCookies();
-//            List<HttpCookie> token = cookies.get("TOKEN");
-//            List<HttpCookie> pubkey = cookies.get("PUBKEY");
-//            if (token != null && pubkey != null) {
-//                Rest<String> rest = service.validateToken(token.get(0).getValue(), pubkey.get(0).getValue());
-//                if (rest.isSuccess()) {
-//                    //鉴权通过
-//                } else {
-//                    //不通过，拦截
-//                    return doReject(exchange);
-//                }
-//            } else {
-//                //没有token，拦截
-//                return doReject(exchange);
-//            }
-//            return chain.filter(exchange);
         };
     }
 
