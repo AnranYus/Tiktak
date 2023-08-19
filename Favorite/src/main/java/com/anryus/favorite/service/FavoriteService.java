@@ -1,9 +1,12 @@
 package com.anryus.favorite.service;
 
+import com.anryus.common.entity.Rest;
+import com.anryus.common.entity.Video;
 import com.anryus.common.utils.JwtUtils;
 import com.anryus.common.utils.SnowFlake;
 import com.anryus.favorite.entity.Favorite;
 import com.anryus.favorite.mapper.FavoriteMapper;
+import com.anryus.favorite.service.client.PublishClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.springframework.stereotype.Service;
@@ -17,14 +20,21 @@ public class FavoriteService {
     FavoriteMapper favoriteMapper;
     final JwtUtils jwtUtils;
 
-    public FavoriteService(FavoriteMapper favoriteMapper,JwtUtils jwtUtils) {
+    final
+    PublishClient publishClient;
+
+    public FavoriteService(FavoriteMapper favoriteMapper, JwtUtils jwtUtils, PublishClient publishClient) {
         this.favoriteMapper = favoriteMapper;
         this.jwtUtils = jwtUtils;
+        this.publishClient = publishClient;
     }
 
     public int actionFavorite(String token,long videoId,int actionType){
-        //TODO 检查video_id是否存在数据库中
-        //TODO 重复操作检查
+        Rest<Video> video = publishClient.getVideo(videoId);
+        if (video.getStatusCode() != 0) {
+            //没有该视频，非法操作
+            return -1;
+        }
 
         String s = jwtUtils.verify(token).get("uid");
         long UID = -1;
@@ -34,18 +44,33 @@ public class FavoriteService {
 
         int result = -1;
 
+
+
         Favorite favorite = new Favorite();
         favorite.setUserUid(UID);
         favorite.setVideoId(videoId);
 
         if (actionType == 1){
-            //新建喜欢
-            favorite.setLikeId(SnowFlake.Gen(1));
-            result = favoriteMapper.insert(favorite);
+
+            QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_uid",UID).eq("video_id",videoId).eq("deleted",true);
+            Favorite exites = favoriteMapper.selectOne(queryWrapper);
+            if (exites != null){
+                //存在被删除的项，恢复
+                exites.setDeleted(false);
+                result = favoriteMapper.updateById(favorite);
+
+            }else {
+                //新建喜欢
+                favorite.setLikeId(SnowFlake.Gen(1));
+                result = favoriteMapper.insert(favorite);
+            }
+
         }else {
+
             //更新为不喜欢
             UpdateWrapper<Favorite> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("user_uid",UID).eq("video_id",videoId);
+            updateWrapper.eq("user_uid",UID).eq("video_id",videoId).eq("deleted",false);
             favorite.setDeleted(true);
             result = favoriteMapper.update(favorite, updateWrapper);
         }

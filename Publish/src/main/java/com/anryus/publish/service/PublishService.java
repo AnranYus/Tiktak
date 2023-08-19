@@ -70,4 +70,8 @@ public class PublishService {
     public String save(MultipartFile file){
         return file.getOriginalFilename();
     }
+
+    public Video getVideoById(Long videoId){
+        return publishMapper.selectById(videoId);
+    }
 }
