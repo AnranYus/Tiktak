@@ -38,4 +38,5 @@ public class Video {
     private String title;
     private long userUid;
     private String descripath;
+    private boolean deleted;
 }

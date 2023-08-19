@@ -62,7 +62,7 @@ public class CommentService {
 
     public List<Comment> getCommentList(String token,long videoId){
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("video_id",videoId);
+        queryWrapper.eq("video_id",videoId).eq("deleted",false);
 
         return favoriteMapper.selectList(queryWrapper);
     }

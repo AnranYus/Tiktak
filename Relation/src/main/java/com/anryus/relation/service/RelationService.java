@@ -52,7 +52,7 @@ public class RelationService {
         long UID = 1;
 
         UpdateWrapper<Relation> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("user_uid",UID).eq("follow_uid",followUid);
+        updateWrapper.eq("user_uid",UID).eq("follow_uid",followUid).eq("deleted",false);
         Relation relation = new Relation();
         relation.setDeleted(true);
 
@@ -61,13 +61,13 @@ public class RelationService {
 
     public List<Relation> getFollowList(String token, long uid){
         QueryWrapper<Relation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_uid",uid);
+        queryWrapper.eq("user_uid",uid).eq("deleted",false);
         return relationMapper.selectList(queryWrapper);
     }
 
     public List<Relation> getFollowerList(String token,long uid){
         QueryWrapper<Relation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("follow_uid",uid);
+        queryWrapper.eq("follow_uid",uid).eq("deleted",false);
         return relationMapper.selectList(queryWrapper);
     }
 

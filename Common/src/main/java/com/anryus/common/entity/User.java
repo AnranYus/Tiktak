@@ -41,5 +41,6 @@ public class User {
     private String totalFavorited;
     private String username;
     private String password;
+    private boolean deleted;
 
 }

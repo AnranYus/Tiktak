@@ -26,7 +26,7 @@ public class FeedService {
     public List<Video> getVideoByLatestTime(Long time, String token){
         Date date = new Date(time);
         QueryWrapper<Video> queryWrapper = new QueryWrapper<>();
-        queryWrapper.ge("updatetime",date);
+        queryWrapper.ge("updatetime",date).eq("deleted",false);
         List<Video> videos = feedMapper.selectList(queryWrapper);
 
         for (Video video : videos) {

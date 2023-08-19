@@ -62,7 +62,7 @@ public class PublishService {
 
     public List<Video> getVideoList(Long uid){
         QueryWrapper<Video> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_uid",uid);
+        queryWrapper.eq("user_uid",uid).eq("deleted",false);
         return publishMapper.selectList(queryWrapper);
     }
 
@@ -72,6 +72,10 @@ public class PublishService {
     }
 
     public Video getVideoById(Long videoId){
-        return publishMapper.selectById(videoId);
+        Video video = publishMapper.selectById(videoId);
+        if (video!= null && !video.isDeleted()){
+            return video;
+        }
+        return null;
     }
 }

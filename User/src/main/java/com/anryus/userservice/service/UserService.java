@@ -29,7 +29,7 @@ public class UserService {
 
     private User findUserByUsername(String username){
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username",username);
+        queryWrapper.eq("username",username).eq("deleted",false);
         return userMapper.selectOne(queryWrapper);
     }
 
@@ -57,7 +57,7 @@ public class UserService {
         String encryptedPassword = encoder.encode(password);
 
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username",username).eq("password",encryptedPassword);
+        queryWrapper.eq("username",username).eq("password",encryptedPassword).eq("deleted",false);
 
         return userMapper.selectOne(queryWrapper);
     }
