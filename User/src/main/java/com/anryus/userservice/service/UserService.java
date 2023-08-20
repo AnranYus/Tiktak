@@ -1,12 +1,18 @@
 package com.anryus.userservice.service;
 
 
+import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.User;
 import com.anryus.common.utils.SnowFlake;
 import com.anryus.userservice.mapper.UserMapper;
+import com.anryus.userservice.utils.Jwt;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import jakarta.annotation.Nonnull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -14,8 +20,11 @@ public class UserService {
     final
     UserMapper userMapper;
 
-    public UserService(UserMapper userMapper) {
+    final Jwt jwt;
+
+    public UserService(UserMapper userMapper,Jwt jwt) {
         this.userMapper = userMapper;
+        this.jwt = jwt;
     }
 
     public User getUserByUid(long uid){
@@ -66,5 +75,14 @@ public class UserService {
             return null;
         }
 
+    }
+
+    @Nonnull
+    public Rest<String> createToken(Long uid, String rule) {
+        String token = jwt.createToken(uid, rule);
+        Map<String,String> map = new HashMap<>();
+        map.put("user_id",uid   .toString());
+        map.put("token",token);
+        return Rest.success("",map);
     }
 }
