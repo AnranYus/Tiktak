@@ -54,11 +54,17 @@ public class UserService {
 
     public User login(String username, String password){
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String encryptedPassword = encoder.encode(password);
-
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username",username).eq("password",encryptedPassword).eq("deleted",false);
 
-        return userMapper.selectOne(queryWrapper);
+        queryWrapper.eq("username",username).eq("deleted",false);
+
+        User user = userMapper.selectOne(queryWrapper);
+        boolean matches = encoder.matches(password, user.getPassword());
+        if (matches){
+            return user;
+        }else {
+            return null;
+        }
+
     }
 }
