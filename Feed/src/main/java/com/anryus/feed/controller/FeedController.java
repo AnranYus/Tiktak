@@ -23,10 +23,10 @@ public class FeedController {
         this.feedService = feedService;
     }
 
-    @GetMapping("/douyin/feed/")
+    @GetMapping("/douyin/feed")
     public FeedRest getUserInfo(@RequestParam("latest_time")@Nullable Long latestTime, @RequestParam("token")@Nullable String token){
         long time;
-        if (latestTime == null){
+        if (latestTime == null || latestTime == 0){
             Date date = new Date();
             time = date.getTime();
         }else {
