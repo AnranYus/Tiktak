@@ -27,9 +27,9 @@ public class RelationController {
         }
 
         if (i > 0){
-            return Rest.success(null,null);
+            return Rest.success(null);
         }else {
-            return Rest.fail(null,null);
+            return Rest.fail(null);
         }
 
     }
@@ -38,19 +38,19 @@ public class RelationController {
     @GetMapping("/douyin/relation/follow/list/")
     public Rest<List<Relation>> followList(@RequestParam("token")String token, @RequestParam("user_id")long uid){
         List<Relation> followList = relationService.getFollowList(token, uid);
-        return Rest.success("",followList);
+        return Rest.success("","follow_list",followList);
     }
 
     @GetMapping("/douyin/relation/follower/list/")
     public Rest<List<Relation>> followerList(@RequestParam("token")String token,@RequestParam("user_id")long uid){
-        List<Relation> followList = relationService.getFollowerList(token, uid);
-        return Rest.success("",followList);
+        List<Relation> followerList = relationService.getFollowerList(token, uid);
+        return Rest.success("","follower_list",followerList);
     }
 
     @GetMapping("/douyin/relation/friend/list/")
     public Rest<List<Relation>> friendList(@RequestParam("token")String token,@RequestParam("user_id")long uid){
         List<Relation> followList = relationService.getFollowerList(token, uid);
-        return Rest.success("",followList);
+        return Rest.success("","follow_list",followList);
     }
 
 

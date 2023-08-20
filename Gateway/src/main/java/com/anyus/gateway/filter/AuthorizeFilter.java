@@ -69,7 +69,7 @@ public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> {
     }
 
     private Mono<Void> doReject(ServerWebExchange exchange) {
-        Rest<String> rest = Rest.fail( "拒绝访问",null);
+        Rest<String> rest = Rest.fail( "拒绝访问");
         ServerHttpResponse response = exchange.getResponse();
         DataBufferFactory dataBufferFactory = response.bufferFactory();
         response.setStatusCode(HttpStatus.UNAUTHORIZED);

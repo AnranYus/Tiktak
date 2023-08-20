@@ -22,26 +22,26 @@ public class CommentController {
         int result = -1;
         if (actionType == 1){
             if (content==null){
-                return Rest.fail("非法操作",null);
+                return Rest.fail("非法操作");
             }
 
             result = commentService.insertComment(token,videoId,content);
             if (result>0){
-                return Rest.success("评论成功",null);
+                return Rest.success("评论成功");
             }else {
-                return Rest.fail("评论失败",null);
+                return Rest.fail("评论失败");
 
             }
         }else {
             if (commentId==null){
-                return Rest.fail("非法操作",null);
+                return Rest.fail("非法操作");
             }
 
             result = commentService.deleteComment(token,commentId);
             if (result>0){
-                return Rest.success("删除成功",null);
+                return Rest.success("删除成功");
             }else {
-                return Rest.fail("删除失败",null);
+                return Rest.fail("删除失败");
             }
         }
 
@@ -52,6 +52,7 @@ public class CommentController {
     @GetMapping("/douyin/comment/list/")
     public Rest<List<Comment>> commentList(@RequestParam("token")String token, @RequestParam("video_id")long videoId ){
         List<Comment> commentList = commentService.getCommentList(token, videoId);
-        return Rest.success(null,commentList);
+
+        return Rest.success(null,"comment",commentList);
     }
 }
