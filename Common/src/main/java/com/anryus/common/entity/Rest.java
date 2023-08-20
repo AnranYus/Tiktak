@@ -1,6 +1,7 @@
 package com.anryus.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +22,7 @@ public class Rest<T> {
     private String statusMsg;
 
     //附加对象
+    @JsonIgnore
     @JsonAnyGetter
     private Map<String,T> attributes = new HashMap<>();
     private String key;
@@ -57,7 +59,7 @@ public class Rest<T> {
         return new Rest<>(STATUS_SUCCESS, statusMsg);
     }
 
-    public T getAttributes(){
+    public T getAttributesObject(){
         return attributes.get(key);
     }
 

@@ -32,7 +32,7 @@ public class FeedService {
         for (Video video : videos) {
             long uid = video.getUserUid();
             Rest<User> userInfo = userClient.getUserInfo(uid, token);
-            video.setAuthor(userInfo.getAttributes());
+            video.setAuthor(userInfo.getAttributesObject());
         }
 
         return videos;
