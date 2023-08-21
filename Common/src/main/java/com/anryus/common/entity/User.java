@@ -1,9 +1,12 @@
 package com.anryus.common.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 @Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class User {
 
     /**
@@ -13,7 +16,7 @@ public class User {
     /**
      * 用户个人页顶部大图
      */
-    private String backgroundImg;
+    private String backgroundImage;
     /**
      * 关注总数
      */
@@ -30,7 +33,7 @@ public class User {
     /**
      * 用户名称
      */
-//    private String name;
+    private String name;
     /**
      * 个人简介
      */
