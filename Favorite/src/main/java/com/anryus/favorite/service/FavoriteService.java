@@ -78,8 +78,13 @@ public class FavoriteService {
     }
 
     public List<Favorite> getFavoriteListByUid(String uid,String token){
+        long userId = Long.parseLong(uid);
+        if (userId == 0){
+            userId = Long.parseLong(jwtUtils.verify(token).get("uid"));
+        }
+
         QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_uid",uid);
+        queryWrapper.eq("user_uid",userId);
         return favoriteMapper.selectList(queryWrapper);
     }
 
