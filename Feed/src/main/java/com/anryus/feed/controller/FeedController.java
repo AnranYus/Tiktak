@@ -1,7 +1,7 @@
 package com.anryus.feed.controller;
 
 import com.anryus.common.entity.Rest;
-import com.anryus.common.entity.Video;
+import com.anryus.common.entity.VideoDTO;
 import com.anryus.feed.service.FeedService;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,8 +32,7 @@ public class FeedController {
         }else {
             time = latestTime;
         }
-        List<Video> videoByLatestTime = feedService.getVideoByLatestTime(time, token);
-
+        List<VideoDTO> videoByLatestTime = feedService.getVideoByLatestTime(time, token);
         Map<String,Object> map = new HashMap<>();
         map.put("next_time",time);
         map.put("video_list",videoByLatestTime);

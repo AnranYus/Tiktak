@@ -2,6 +2,7 @@ package com.anryus.publish.controller;
 
 import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.Video;
+import com.anryus.common.entity.VideoDTO;
 import com.anryus.publish.service.PublishService;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +30,8 @@ public class PublishController {
     }
 
     @GetMapping("/douyin/publish/list/")
-    public Rest<List<Video>> getPublishVideoList(@RequestParam("token")@Nullable String token, @RequestParam("user_id")Long uid){
-        List<Video> videoList = service.getVideoList(uid);
+    public Rest<List<VideoDTO>> getPublishVideoList(@RequestParam("token")@Nullable String token, @RequestParam("user_id")Long uid){
+        List<VideoDTO> videoList = service.getVideoList(uid);
         return Rest.success("","video_list",videoList);
     }
 

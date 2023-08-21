@@ -4,17 +4,17 @@ package com.anryus.publish.service;
 import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.User;
 import com.anryus.common.entity.Video;
+import com.anryus.common.entity.VideoDTO;
 import com.anryus.common.utils.JwtUtils;
 import com.anryus.common.utils.SnowFlake;
 import com.anryus.publish.mapper.PublishMapper;
 import com.anryus.publish.service.client.UserClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,15 +44,8 @@ public class PublishService {
         if (map!=null){
             long uid = Long.parseLong(map.get("uid"));
 
-            Rest<User> userRest = userClient.getUserInfo(uid,token);
-
-            Video video = new Video();
+            Video video = new Video(file.getOriginalFilename(),file.getOriginalFilename(),title,uid,null);
             video.setVideoId(SnowFlake.Gen(1));
-            video.setVideoPath(file.getOriginalFilename());//TODO
-            video.setTitle(title);
-            video.setCoverPath(file.getOriginalFilename());//TODO
-            video.setUserUid(uid);
-            video.setDescripath("Test");
             //TODO SAVE
             return publishMapper.insert(video);
 
@@ -60,10 +53,18 @@ public class PublishService {
         return -1;
     }
 
-    public List<Video> getVideoList(Long uid){
+    public List<VideoDTO> getVideoList(Long uid){
         QueryWrapper<Video> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_uid",uid).eq("deleted",false);
-        return publishMapper.selectList(queryWrapper);
+        List<Video> videos = publishMapper.selectList(queryWrapper);
+        List<VideoDTO> videoDTOS = new ArrayList<>();
+        for (Video item:videos){
+            Rest<User> userInfo = userClient.getUserInfo(item.getUserUid(), null);
+            VideoDTO videoDTO = VideoDTO.parseVideoDTO(item,userInfo.getAttributes().get("user"));
+            videoDTOS.add(videoDTO);
+        }
+
+        return videoDTOS;
     }
 
     //TODO 保存上传视频
