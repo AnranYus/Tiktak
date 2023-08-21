@@ -4,7 +4,7 @@ import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.Video;
 import com.anryus.common.utils.JwtUtils;
 import com.anryus.common.utils.SnowFlake;
-import com.anryus.favorite.entity.Favorite;
+import com.anryus.common.entity.Favorite;
 import com.anryus.favorite.mapper.FavoriteMapper;
 import com.anryus.favorite.service.client.PublishClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -77,15 +77,31 @@ public class FavoriteService {
         return result;
     }
 
-    public List<Favorite> getFavoriteListByUid(String uid,String token){
-        long userId = Long.parseLong(uid);
-        if (userId == 0){
+    public List<Favorite> getFavoriteListByUid(Long uid,String token){
+        long userId = uid;
+        if (userId <= 0){
             userId = Long.parseLong(jwtUtils.verify(token).get("uid"));
         }
 
         QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_uid",userId);
         return favoriteMapper.selectList(queryWrapper);
+    }
+
+    public boolean isFavorite(long userId,String token,Long videoId){
+        long uid = userId;
+        if (userId <=0){
+            String str = jwtUtils.verify(token).get("uid");
+            if (str != null){
+                uid = Long.parseLong(str);
+            }
+        }
+
+        QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_uid",uid).eq("video_id",videoId).eq("deleted",false);
+        Favorite favorite = favoriteMapper.selectOne(queryWrapper);
+        return favorite != null;
+
     }
 
 }

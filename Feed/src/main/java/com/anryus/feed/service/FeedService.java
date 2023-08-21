@@ -5,6 +5,7 @@ import com.anryus.common.entity.User;
 import com.anryus.common.entity.Video;
 import com.anryus.common.entity.VideoDTO;
 import com.anryus.feed.mapper.FeedMapper;
+import com.anryus.feed.service.client.FavoriteClient;
 import com.anryus.feed.service.client.UserClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.slf4j.Logger;
@@ -22,9 +23,13 @@ public class FeedService {
     final FeedMapper feedMapper;
     final UserClient userClient;
 
-    public FeedService(FeedMapper feedMapper, UserClient userClient) {
+    final
+    FavoriteClient favoriteClient;
+
+    public FeedService(FeedMapper feedMapper, UserClient userClient, FavoriteClient favoriteClient) {
         this.feedMapper = feedMapper;
         this.userClient = userClient;
+        this.favoriteClient = favoriteClient;
     }
 
     //获取视频列表
@@ -38,7 +43,7 @@ public class FeedService {
             long uid = video.getUserUid();
             Rest<User> userInfo = userClient.getUserInfo(uid, token);
             logger.info(userInfo.toString());
-            VideoDTO dto = VideoDTO.parseVideoDTO(video,userInfo.getAttributes().get("user"));
+            VideoDTO dto = VideoDTO.parseVideoDTO(video,userInfo.getAttributes().get("user"), favoriteClient.isFavorite(0L,video.getVideoId(),token));
             result.add(dto);
         }
 

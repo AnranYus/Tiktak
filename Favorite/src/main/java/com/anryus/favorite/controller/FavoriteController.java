@@ -1,9 +1,10 @@
 package com.anryus.favorite.controller;
 
 import com.anryus.common.entity.Rest;
-import com.anryus.favorite.entity.Favorite;
+import com.anryus.common.entity.Favorite;
+import com.anryus.common.utils.JwtUtils;
 import com.anryus.favorite.service.FavoriteService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +15,25 @@ import java.util.List;
 @ResponseBody
 public class FavoriteController {
 
-    @Autowired
+    final
     FavoriteService favoriteService;
+    final
+    JwtUtils jwtUtils;
 
-    @PostMapping("/do/favorite/action/")
+    public FavoriteController(FavoriteService favoriteService, JwtUtils jwtUtils) {
+        this.favoriteService = favoriteService;
+        this.jwtUtils = jwtUtils;
+    }
+
+    @PostMapping("/douyin/favorite/action/")
     public Rest<Object> favoriteAction(@RequestParam("token")String token, @RequestParam("video_id")long videoId, @RequestParam("action_type")int actionType){
+
+        boolean favorite = favoriteService.isFavorite(0, token, videoId);
+
+        if (favorite){
+            return Rest.fail("已经喜欢过了");
+        }
+
         int i = favoriteService.actionFavorite(token, videoId, actionType);
         if (i == -1){
             return Rest.fail("操作失败");
@@ -28,9 +43,14 @@ public class FavoriteController {
     }
 
     @GetMapping("/douyin/favorite/list/")
-    public Rest<List<Favorite>> favoriteList(@RequestParam("user_id")String userId, @RequestParam("token") String token){
+    public Rest<List<Favorite>> favoriteList(@RequestParam("user_id")Long userId, @RequestParam("token") String token){
         List<Favorite> favoriteListByUid = favoriteService.getFavoriteListByUid(userId, token);
         return Rest.success(null,"favorite_list",favoriteListByUid);
+    }
+
+    @GetMapping("/douyin/favorite/is")
+    public boolean isFavorite(@RequestParam("user_id")Long userId,@RequestParam("video_id") Long videoId,@RequestParam("token")@Nullable String token){
+        return favoriteService.isFavorite(userId, token, videoId);
     }
 
 }

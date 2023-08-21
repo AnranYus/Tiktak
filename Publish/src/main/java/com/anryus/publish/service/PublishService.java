@@ -8,6 +8,7 @@ import com.anryus.common.entity.VideoDTO;
 import com.anryus.common.utils.JwtUtils;
 import com.anryus.common.utils.SnowFlake;
 import com.anryus.publish.mapper.PublishMapper;
+import com.anryus.publish.service.client.FavoriteClient;
 import com.anryus.publish.service.client.UserClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -30,11 +31,15 @@ public class PublishService {
     final
     JwtUtils jwtUtils;
 
-    public PublishService(UserClient userClient, PublishMapper publishMapper, StringRedisTemplate template, JwtUtils jwtUtils) {
+    final
+    FavoriteClient favoriteClient;
+
+    public PublishService(UserClient userClient, PublishMapper publishMapper, StringRedisTemplate template, JwtUtils jwtUtils, FavoriteClient favoriteClient) {
         this.userClient = userClient;
         this.publishMapper = publishMapper;
         this.template = template;
         this.jwtUtils = jwtUtils;
+        this.favoriteClient = favoriteClient;
     }
 
     public int pushVideo( MultipartFile file,String token, String title){
@@ -60,7 +65,8 @@ public class PublishService {
         List<VideoDTO> videoDTOS = new ArrayList<>();
         for (Video item:videos){
             Rest<User> userInfo = userClient.getUserInfo(item.getUserUid(), null);
-            VideoDTO videoDTO = VideoDTO.parseVideoDTO(item,userInfo.getAttributes().get("user"));
+            VideoDTO videoDTO = VideoDTO.parseVideoDTO(item,userInfo.getAttributes().get("user"),
+                    favoriteClient.isFavorite(uid,item.getVideoId(),null));
             videoDTOS.add(videoDTO);
         }
 
