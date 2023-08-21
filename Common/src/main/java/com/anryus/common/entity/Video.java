@@ -1,16 +1,39 @@
 package com.anryus.common.entity;
 
+import com.anryus.common.utils.SnowFlake;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 @Data
 public class Video {
-    /**
-     * 视频作者信息
-     */
-    @TableField(exist = false)
-    private User author;
+
+    public Video(String coverPath, String videoPath, String title, long userUid, String descripath) {
+        this.videoId = SnowFlake.Gen(1);
+        this.coverUrl = coverPath;
+        this.videoUrl = videoPath;
+        this.title = title;
+        this.userUid = userUid;
+        this.descripath = descripath;
+    }
+
+    public Video(long commentCount, String coverUrl, long likeCount, Long videoId, String videoUrl, String title, long userUid, String descripath, boolean deleted) {
+        this.commentCount = commentCount;
+        this.coverUrl = coverUrl;
+        this.likeCount = likeCount;
+        this.videoId = videoId;
+        this.videoUrl = videoUrl;
+        this.title = title;
+        this.userUid = userUid;
+        this.descripath = descripath;
+        this.deleted = deleted;
+    }
+
+    public Video() {
+    }
+
     /**
      * 视频的评论总数
      */
@@ -18,7 +41,7 @@ public class Video {
     /**
      * 视频封面地址
      */
-    private String coverPath;
+    private String coverUrl;
     /**
      * 视频的点赞总数
      */
@@ -31,7 +54,7 @@ public class Video {
     /**
      * 视频播放地址
      */
-    private String videoPath;
+    private String videoUrl;
     /**
      * 视频标题
      */

@@ -1,14 +1,16 @@
 package com.anryus.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter
-@Setter
+@Data
 public class Rest<T> {
 
     /**
@@ -21,9 +23,10 @@ public class Rest<T> {
     private String statusMsg;
 
     //附加对象
+    @JsonIgnore
     @JsonAnyGetter
+    @JsonAnySetter
     private Map<String,T> attributes = new HashMap<>();
-    private String key;
 
     public static byte STATUS_SUCCESS = 0;
     public static byte STATUS_FAIL = 1;
@@ -36,17 +39,16 @@ public class Rest<T> {
         this.statusMsg = statusMsg;
     }
 
-    public Rest(long statusCode, String statusMsg,String key ,Map<String,T> attributes) {
+    public Rest(long statusCode, String statusMsg,Map<String,T> attributes) {
         this.statusCode = statusCode;
         this.statusMsg = statusMsg;
-        this.key = key;
         this.attributes.putAll(attributes);
     }
 
     public static <T> Rest<T> success(String statusMsg,String key,T value){
         Map<String,T> map = new HashMap<>();
         map.put(key,value);
-        return new Rest<>(STATUS_SUCCESS, statusMsg, key,map);
+        return new Rest<>(STATUS_SUCCESS, statusMsg,map);
     }
 
     public static <T> Rest<T> fail(String statusMsg){
@@ -57,9 +59,8 @@ public class Rest<T> {
         return new Rest<>(STATUS_SUCCESS, statusMsg);
     }
 
-    public T getAttributes(){
-        return attributes.get(key);
+    public static <T> Rest<T> success(String statusMsg,Map<String,T> map){
+        return new Rest<>(STATUS_SUCCESS, statusMsg,map);
     }
-
 
 }
