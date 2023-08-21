@@ -39,27 +39,14 @@ public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> {
         return (exchange, chain) -> {
             //检查是否拥有token
             ServerHttpRequest request = exchange.getRequest();
-            HttpMethod method = request.getMethod();
             AtomicReference<String> token = new AtomicReference<>();
 
-            if (method == HttpMethod.GET){
-                token.set(request.getQueryParams().getFirst("token"));
-
-                if (token.get() != null && !Objects.equals(token.get(), "")){
-                    Map<String, String> verify = jwtUtils.verify(token.get());
-                    String uid = verify.get("uid");
-                    String rule = verify.get("rule");
-
-                    if (uid != null && rule != null){
-                        //TODO 暂时的不做角色鉴权,因为客户端没有提供管理员角色
-                        return   chain.filter(exchange);
-                    }
-                }
-            }
-
-            if (method == HttpMethod.POST){
-                //TODO 暂时无法从Body中获取token，需要新的解决方案
-                return   chain.filter(exchange);
+            token.set(request.getQueryParams().getFirst("token"));
+            if (token.get() != null && !Objects.equals(token.get(), "")){
+                Map<String, String> verify = jwtUtils.verify(token.get());
+                String uid = verify.get("uid");
+                request.mutate().header("user-id",uid).build();
+                return chain.filter(exchange.mutate().request(request).build());
             }
 
 

@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Component
 
-public class MyGlobalFilter implements GlobalFilter {
+public class RequestFilter implements GlobalFilter {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -27,11 +27,7 @@ public class MyGlobalFilter implements GlobalFilter {
         URI origin = request.getURI();
         HttpMethod method = request.getMethod();
         MultiValueMap<String, String> queryParams = request.getQueryParams();
-        logger.info(method+":"+origin+"/"+queryParams);
-        return chain.filter(exchange).then(Mono.fromRunnable(() -> {
-            ServerHttpResponse response = exchange.getResponse();
-            // 打印响应信息
-            logger.info("Response:"+Objects.requireNonNull(response.getStatusCode()).value());
-        }));
+        logger.info(method+":"+origin+" "+queryParams);
+        return chain.filter(exchange);
     }
 }
