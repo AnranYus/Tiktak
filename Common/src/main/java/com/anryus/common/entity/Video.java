@@ -1,10 +1,8 @@
 package com.anryus.common.entity;
 
 import com.anryus.common.utils.SnowFlake;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -45,15 +43,18 @@ public class Video {
     /**
      * 视频的点赞总数
      */
+    @JsonProperty("favorite_count")
     private long likeCount;
     /**
      * 视频唯一标识
      */
     @TableId("video_id")
+    @JsonProperty("id")
     private Long videoId;
     /**
      * 视频播放地址
      */
+    @JsonProperty("play_url")
     private String videoUrl;
     /**
      * 视频标题

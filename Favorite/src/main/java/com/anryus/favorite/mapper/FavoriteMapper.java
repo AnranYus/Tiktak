@@ -1,6 +1,6 @@
 package com.anryus.favorite.mapper;
 
-import com.anryus.favorite.entity.Favorite;
+import com.anryus.common.entity.Favorite;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

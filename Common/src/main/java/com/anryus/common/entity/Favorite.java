@@ -1,4 +1,4 @@
-package com.anryus.favorite.entity;
+package com.anryus.common.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
