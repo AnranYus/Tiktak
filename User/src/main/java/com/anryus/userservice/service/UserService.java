@@ -57,6 +57,7 @@ public class UserService {
         user.setUid(SnowFlake.Gen(1));
         user.setUsername(username);
         user.setPassword(encryptedPassword);
+        user.setName(username);
         userMapper.insert(user);
         return user;
     }
