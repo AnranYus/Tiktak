@@ -4,13 +4,11 @@ import com.anryus.common.entity.Rest;
 import com.anryus.common.utils.JwtUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -25,7 +23,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
-public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> {
+public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> implements Ordered {
 
     final
     JwtUtils jwtUtils;
@@ -72,4 +70,8 @@ public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> {
         return response.writeWith(Mono.just(body).block());
     }
 
+    @Override
+    public int getOrder() {
+        return 1;
+    }
 }
