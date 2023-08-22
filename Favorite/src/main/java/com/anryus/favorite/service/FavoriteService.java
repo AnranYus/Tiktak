@@ -10,12 +10,15 @@ import com.anryus.favorite.service.client.FeedClient;
 import com.anryus.favorite.service.client.PublishClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class FavoriteService {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     final
     FavoriteMapper favoriteMapper;
@@ -64,7 +67,7 @@ public class FavoriteService {
             if (exites != null){
                 //存在被删除的项，恢复
                 exites.setDeleted(false);
-                result = favoriteMapper.updateById(favorite);
+                result = favoriteMapper.updateById(exites);
 
             }else {
                 //新建喜欢
@@ -76,9 +79,9 @@ public class FavoriteService {
 
             //更新为不喜欢
             UpdateWrapper<Favorite> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("user_uid",UID).eq("video_id",videoId).eq("deleted",false);
+            updateWrapper.eq("user_uid",UID).eq("video_id",videoId).eq("deleted",false).set("deleted",true);
             favorite.setDeleted(true);
-            result = favoriteMapper.update(favorite, updateWrapper);
+            result = favoriteMapper.update(favorite,updateWrapper);
         }
 
         if (result > -1){

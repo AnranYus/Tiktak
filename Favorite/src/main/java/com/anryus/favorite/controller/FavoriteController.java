@@ -28,10 +28,12 @@ public class FavoriteController {
     @PostMapping("/douyin/favorite/action/")
     public Rest<Object> favoriteAction(@RequestParam("token")String token, @RequestParam("video_id")long videoId, @RequestParam("action_type")int actionType){
 
-        boolean favorite = favoriteService.isFavorite(0, token, videoId);
+        if (actionType == 1) {
+            boolean favorite = favoriteService.isFavorite(0, token, videoId);
 
-        if (favorite){
-            return Rest.fail("已经喜欢过了");
+            if (favorite) {
+                return Rest.fail("已经喜欢过了");
+            }
         }
 
         int i = favoriteService.actionFavorite(token, videoId, actionType);
