@@ -6,6 +6,7 @@ import com.anryus.common.utils.JwtUtils;
 import com.anryus.common.utils.SnowFlake;
 import com.anryus.common.entity.Favorite;
 import com.anryus.favorite.mapper.FavoriteMapper;
+import com.anryus.favorite.service.client.FeedClient;
 import com.anryus.favorite.service.client.PublishClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -23,10 +24,15 @@ public class FavoriteService {
     final
     PublishClient publishClient;
 
-    public FavoriteService(FavoriteMapper favoriteMapper, JwtUtils jwtUtils, PublishClient publishClient) {
+    final
+    FeedClient feedClient;
+
+
+    public FavoriteService(FavoriteMapper favoriteMapper, JwtUtils jwtUtils, PublishClient publishClient, FeedClient feedClient) {
         this.favoriteMapper = favoriteMapper;
         this.jwtUtils = jwtUtils;
         this.publishClient = publishClient;
+        this.feedClient = feedClient;
     }
 
     public int actionFavorite(String token,long videoId,int actionType){
@@ -74,6 +80,11 @@ public class FavoriteService {
             favorite.setDeleted(true);
             result = favoriteMapper.update(favorite, updateWrapper);
         }
+
+        if (result > -1){
+            feedClient.favoriteAction(videoId,actionType);
+        }
+
         return result;
     }
 

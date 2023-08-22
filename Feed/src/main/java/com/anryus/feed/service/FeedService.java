@@ -50,7 +50,18 @@ public class FeedService {
         return result;
     }
 
-//    public List<Video> getVideoByUid(String uid){
-//        return basicMapper.findVideoByUid(uid);
-//    }
+    public Video favoriteAction(Long videoId,int action){
+        Video video = feedMapper.selectById(videoId);
+        if (video == null){
+            return null;
+        }
+        if (action == 1){
+            video.setLikeCount(video.getLikeCount() + 1);
+        }else {
+            video.setLikeCount(video.getLikeCount() - 1);
+
+        }
+        feedMapper.updateById(video);
+        return video;
+    }
 }
