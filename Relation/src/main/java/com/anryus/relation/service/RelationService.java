@@ -52,11 +52,12 @@ public class RelationService {
     }
 
     public int unFollow(Long uid,long followUid){
-        UpdateWrapper<Relation> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("user_uid",uid).eq("follow_uid",followUid).eq("deleted",false);
-        Relation relation = new Relation();
+        QueryWrapper<Relation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_uid",uid).eq("follow_uid",followUid).eq("deleted",false);
+        Relation relation = relationMapper.selectOne(queryWrapper);
+
         relation.setDeleted(true);
-        int update = relationMapper.update(relation, updateWrapper);
+        int update = relationMapper.updateById(relation);
         if (update > 0){
             userClient.unfollowAction(relation.getUserUid(),1);
             userClient.unfollowAction(relation.getFollowUid(),2);
