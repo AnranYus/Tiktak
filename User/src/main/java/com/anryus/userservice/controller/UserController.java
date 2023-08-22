@@ -63,6 +63,26 @@ public class UserController {
         return Rest.fail("账户或密码错误");
     }
 
+    @PostMapping("/douyin/user/follow/")
+    public Rest<String> followAction(@RequestParam("user_id")long uid,@RequestParam("action")int action){
+        User user = userService.followAction(uid, action);
+        if (user != null){
+            return Rest.success("");
+        }else {
+            return Rest.fail("");
+        }
+    }
+
+    @PostMapping("/douyin/user/unfollow/")
+    public Rest<String> unfollowAction(@RequestParam("user_id")long uid,@RequestParam("action")int action){
+        User user = userService.unfollowAction(uid, action);
+        if (user != null){
+            return Rest.success("");
+        }else {
+            return Rest.fail("");
+        }
+    }
+
 
 
 }

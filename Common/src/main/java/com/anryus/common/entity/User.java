@@ -1,6 +1,7 @@
 package com.anryus.common.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
@@ -29,6 +30,7 @@ public class User {
      * 用户id
      */
     @TableId("uid")
+    @JsonProperty("id")
     private Long uid;
     /**
      * 用户名称

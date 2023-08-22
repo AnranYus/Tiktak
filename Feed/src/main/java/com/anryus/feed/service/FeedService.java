@@ -1,9 +1,6 @@
 package com.anryus.feed.service;
 
-import com.anryus.common.entity.Rest;
-import com.anryus.common.entity.User;
-import com.anryus.common.entity.Video;
-import com.anryus.common.entity.VideoDTO;
+import com.anryus.common.entity.*;
 import com.anryus.feed.mapper.FeedMapper;
 import com.anryus.feed.service.client.FavoriteClient;
 import com.anryus.feed.service.client.UserClient;
@@ -43,14 +40,60 @@ public class FeedService {
             long uid = video.getUserUid();
             Rest<User> userInfo = userClient.getUserInfo(uid, token);
             logger.info(userInfo.toString());
-            VideoDTO dto = VideoDTO.parseVideoDTO(video,userInfo.getAttributes().get("user"), favoriteClient.isFavorite(0L,video.getVideoId(),token));
+            boolean favorite = false;
+            if (token!=null){
+                favorite = favoriteClient.isFavorite(0L, video.getVideoId(), token);
+            }
+
+            VideoDTO dto = VideoDTO.parseVideoDTO(video,userInfo.getAttributes().get("user"),favorite );
             result.add(dto);
         }
 
         return result;
     }
 
-//    public List<Video> getVideoByUid(String uid){
-//        return basicMapper.findVideoByUid(uid);
-//    }
+    public Video favoriteAction(Long videoId,int action){
+        Video video = feedMapper.selectById(videoId);
+        if (video == null){
+            return null;
+        }
+        if (action == 1){
+            video.setLikeCount(video.getLikeCount() + 1);
+        }else {
+            video.setLikeCount(video.getLikeCount() - 1);
+
+        }
+        feedMapper.updateById(video);
+        return video;
+    }
+
+    public Video commentAction(Long videoId,int action){
+        Video video = feedMapper.selectById(videoId);
+        if (video == null){
+            return null;
+        }
+        if (action == 1){
+            video.setCommentCount(video.getCommentCount() + 1);
+        }else {
+            video.setCommentCount(video.getCommentCount() - 1);
+
+        }
+        feedMapper.updateById(video);
+        return video;
+    }
+
+    public List<VideoDTO> getFavoriteVideo(List<Favorite> favorites){
+        List<VideoDTO> videoDTOS = new ArrayList<>();
+        for (Favorite favorite : favorites) {
+            Video video = feedMapper.selectById(favorite.getVideoId());
+            Rest<User> userInfo = userClient.getUserInfo(favorite.getUserUid(), null);
+            User user = userInfo.getAttributes().get("user");
+            if (user != null){
+                VideoDTO videoDTO = VideoDTO.parseVideoDTO(video, user,true);
+
+                videoDTOS.add(videoDTO);
+            }
+        }
+        return videoDTOS;
+    }
 }

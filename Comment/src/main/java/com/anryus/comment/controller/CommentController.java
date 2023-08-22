@@ -2,6 +2,7 @@ package com.anryus.comment.controller;
 
 
 import com.anryus.comment.entity.Comment;
+import com.anryus.comment.entity.dto.CommentDTO;
 import com.anryus.comment.service.CommentService;
 import com.anryus.common.entity.Rest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +19,16 @@ public class CommentController {
     CommentService commentService;
 
     @PostMapping("/douyin/comment/action/")
-    public Rest postComment(@RequestParam("token")String token, @RequestParam("video_id")long videoId, @RequestParam("action_type")int actionType, @RequestParam("comment_content")@Nullable String content, @RequestParam("comment_id")@Nullable Long commentId){
+    public Rest<CommentDTO> postComment(@RequestHeader("user-id")Long uid , @RequestParam("video_id")long videoId, @RequestParam("action_type")int actionType, @RequestParam("comment_text")@Nullable String content, @RequestParam("comment_id")@Nullable Long commentId){
         int result = -1;
         if (actionType == 1){
             if (content==null){
                 return Rest.fail("非法操作");
             }
 
-            result = commentService.insertComment(token,videoId,content);
-            if (result>0){
-                return Rest.success("评论成功");
+            CommentDTO dto = commentService.insertComment(uid, videoId, content);
+            if (dto != null){
+                return Rest.success("评论成功","comment",dto);
             }else {
                 return Rest.fail("评论失败");
 
@@ -37,7 +38,7 @@ public class CommentController {
                 return Rest.fail("非法操作");
             }
 
-            result = commentService.deleteComment(token,commentId);
+            result = commentService.deleteComment(uid,commentId);
             if (result>0){
                 return Rest.success("删除成功");
             }else {
@@ -50,9 +51,9 @@ public class CommentController {
     }
 
     @GetMapping("/douyin/comment/list/")
-    public Rest<List<Comment>> commentList(@RequestParam("token")String token, @RequestParam("video_id")long videoId ){
-        List<Comment> commentList = commentService.getCommentList(token, videoId);
+    public Rest<List<CommentDTO>> commentList(@RequestParam("token")String token, @RequestParam("video_id")long videoId ){
+        List<CommentDTO> commentList = commentService.getCommentList(token, videoId);
 
-        return Rest.success(null,"comment",commentList);
+        return Rest.success(null,"comment_list",commentList);
     }
 }

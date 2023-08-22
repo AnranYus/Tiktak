@@ -57,6 +57,7 @@ public class UserService {
         user.setUid(SnowFlake.Gen(1));
         user.setUsername(username);
         user.setPassword(encryptedPassword);
+        user.setName(username);
         userMapper.insert(user);
         return user;
     }
@@ -81,8 +82,49 @@ public class UserService {
     public Rest<String> createToken(Long uid, String rule) {
         String token = jwt.createToken(uid, rule);
         Map<String,String> map = new HashMap<>();
-        map.put("user_id",uid   .toString());
+        map.put("user_id",uid.toString());
         map.put("token",token);
         return Rest.success("",map);
     }
+
+    public User followAction(long uid,int action){
+        User user = userMapper.selectById(uid);
+        if (user!=null){
+            if (action == 1){
+                //Follow
+                user.setFollowCount(user.getFollowCount() + 1);
+                userMapper.updateById(user);
+            }else if (action == 2){
+                //UnFollow
+                user.setFollowerCount(user.getFollowerCount() + 1);
+                userMapper.updateById(user);
+            }
+            return user;
+        }
+
+        //TODO 异常处理
+        return null;
+
+    }
+
+    public User unfollowAction(long uid,int action){
+        User user = userMapper.selectById(uid);
+        if (user!=null){
+            if (action == 1){
+                //Follow
+                user.setFollowCount(user.getFollowCount() - 1);
+                userMapper.updateById(user);
+            }else if (action == 2){
+                //UnFollow
+                user.setFollowerCount(user.getFollowerCount() - 1);
+                userMapper.updateById(user);
+            }
+            return user;
+        }
+
+        //TODO 异常处理
+        return null;
+
+    }
+
 }

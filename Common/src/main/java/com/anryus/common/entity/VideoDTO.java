@@ -11,10 +11,10 @@ import lombok.EqualsAndHashCode;
 @Data
 public class VideoDTO extends Video {
 
-    private final User author;
+    private User author;
 
     @JsonProperty("is_favorite")
-    private final boolean favorite;
+    private boolean favorite;
 
     public VideoDTO(long commentCount, String coverUrl, long likeCount, Long videoId, String videoUrl, String title, long userUid, String descripath, boolean deleted, User author,boolean favorite) {
         super(commentCount, coverUrl, likeCount, videoId, videoUrl, title, userUid, descripath, deleted);
@@ -26,4 +26,6 @@ public class VideoDTO extends Video {
         return new VideoDTO(video.getCommentCount(), video.getCoverUrl(), video.getLikeCount(), video.getVideoId(), video.getVideoUrl(), video.getTitle(), video.getUserUid(), video.getDescripath(), video.isDeleted(),author,favorite);
     }
 
+    public VideoDTO() {
+    }
 }
