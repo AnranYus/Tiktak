@@ -43,7 +43,12 @@ public class FeedService {
             long uid = video.getUserUid();
             Rest<User> userInfo = userClient.getUserInfo(uid, token);
             logger.info(userInfo.toString());
-            VideoDTO dto = VideoDTO.parseVideoDTO(video,userInfo.getAttributes().get("user"), favoriteClient.isFavorite(0L,video.getVideoId(),token));
+            boolean favorite = false;
+            if (token!=null){
+                favorite = favoriteClient.isFavorite(0L, video.getVideoId(), token);
+            }
+
+            VideoDTO dto = VideoDTO.parseVideoDTO(video,userInfo.getAttributes().get("user"),favorite );
             result.add(dto);
         }
 
