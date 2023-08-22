@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework.cloud:spring-cloud-loadbalancer:4.0.4")
     implementation("mysql:mysql-connector-java:8.0.33")
 
     compileOnly("org.projectlombok:lombok:1.18.28")
