@@ -27,32 +27,21 @@ public class RelationService {
         this.jwtUtils = jwtUtils;
     }
 
-    public int insertFollow(String token,long followUid){
-        String uidStr = jwtUtils.verify(token).get("uid");
-        long UID = -1;
-
-        if (uidStr != null){
-            UID = Long.parseLong(uidStr);
-        }else {
-            return -1;
-        }
+    public int insertFollow(Long uid,long followUid){
 
         //TODO 检查是否存在历史的关注记录
         Relation relation = new Relation();
         relation.setFollowId(SnowFlake.Gen(1));
-        relation.setUserUid(UID);
+        relation.setUserUid(uid);
         relation.setFollowUid(followUid);
         relation.setDeleted(false);
 
         return relationMapper.insert(relation);
     }
 
-    public int unFollow(String token,long followUid){
-        //TODO token获取UID
-        long UID = 1;
-
+    public int unFollow(Long uid,long followUid){
         UpdateWrapper<Relation> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("user_uid",UID).eq("follow_uid",followUid).eq("deleted",false);
+        updateWrapper.eq("user_uid",uid).eq("follow_uid",followUid).eq("deleted",false);
         Relation relation = new Relation();
         relation.setDeleted(true);
 

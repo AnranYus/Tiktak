@@ -17,13 +17,13 @@ public class RelationController {
     RelationService relationService;
 
     @PostMapping("/douyin/relation/action/")
-    public Rest newFollow(@RequestParam("token")String token, @RequestParam("to_user_id")long followUid, @RequestParam("action_type")int actionType){
+    public Rest newFollow(@RequestHeader("user-id")Long uid, @RequestParam("to_user_id")long followUid, @RequestParam("action_type")int actionType){
 
         int i;
         if (actionType == 1){
-            i = relationService.insertFollow(token, followUid);
+            i = relationService.insertFollow(uid, followUid);
         }else {
-            i = relationService.unFollow(token, followUid);
+            i = relationService.unFollow(uid, followUid);
         }
 
         if (i > 0){
