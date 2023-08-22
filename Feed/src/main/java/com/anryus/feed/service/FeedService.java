@@ -1,9 +1,6 @@
 package com.anryus.feed.service;
 
-import com.anryus.common.entity.Rest;
-import com.anryus.common.entity.User;
-import com.anryus.common.entity.Video;
-import com.anryus.common.entity.VideoDTO;
+import com.anryus.common.entity.*;
 import com.anryus.feed.mapper.FeedMapper;
 import com.anryus.feed.service.client.FavoriteClient;
 import com.anryus.feed.service.client.UserClient;
@@ -83,5 +80,20 @@ public class FeedService {
         }
         feedMapper.updateById(video);
         return video;
+    }
+
+    public List<VideoDTO> getFavoriteVideo(List<Favorite> favorites){
+        List<VideoDTO> videoDTOS = new ArrayList<>();
+        for (Favorite favorite : favorites) {
+            Video video = feedMapper.selectById(favorite.getVideoId());
+            Rest<User> userInfo = userClient.getUserInfo(favorite.getUserUid(), null);
+            User user = userInfo.getAttributes().get("user");
+            if (user != null){
+                VideoDTO videoDTO = VideoDTO.parseVideoDTO(video, user,true);
+
+                videoDTOS.add(videoDTO);
+            }
+        }
+        return videoDTOS;
     }
 }

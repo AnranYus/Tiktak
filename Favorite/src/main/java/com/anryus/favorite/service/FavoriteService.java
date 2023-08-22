@@ -2,6 +2,7 @@ package com.anryus.favorite.service;
 
 import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.Video;
+import com.anryus.common.entity.VideoDTO;
 import com.anryus.common.utils.JwtUtils;
 import com.anryus.common.utils.SnowFlake;
 import com.anryus.common.entity.Favorite;
@@ -91,7 +92,7 @@ public class FavoriteService {
         return result;
     }
 
-    public List<Favorite> getFavoriteListByUid(Long uid,String token){
+    public Rest<List<VideoDTO>> getFavoriteListByUid(Long uid, String token){
         long userId = uid;
         if (userId <= 0){
             userId = Long.parseLong(jwtUtils.verify(token).get("uid"));
@@ -99,7 +100,8 @@ public class FavoriteService {
 
         QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_uid",userId);
-        return favoriteMapper.selectList(queryWrapper);
+        List<Favorite> favorites = favoriteMapper.selectList(queryWrapper);
+        return feedClient.favoriteVideos(favorites);
     }
 
     public boolean isFavorite(long userId,String token,Long videoId){

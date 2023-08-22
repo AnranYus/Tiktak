@@ -1,5 +1,6 @@
 package com.anryus.feed.controller;
 
+import com.anryus.common.entity.Favorite;
 import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.Video;
 import com.anryus.common.entity.VideoDTO;
@@ -58,5 +59,11 @@ public class FeedController {
         }else {
             return Rest.fail("");
         }
+    }
+
+    @PostMapping("/douyin/feed/videos")
+    public Rest<List<VideoDTO>> favoriteVideos(@RequestBody List<Favorite> favorites){
+        List<VideoDTO> favoriteVideo = feedService.getFavoriteVideo(favorites);
+        return Rest.success("","video_list",favoriteVideo);
     }
 }

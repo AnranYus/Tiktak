@@ -1,7 +1,7 @@
 package com.anryus.favorite.controller;
 
 import com.anryus.common.entity.Rest;
-import com.anryus.common.entity.Favorite;
+import com.anryus.common.entity.VideoDTO;
 import com.anryus.common.utils.JwtUtils;
 import com.anryus.favorite.service.FavoriteService;
 import org.springframework.lang.Nullable;
@@ -45,9 +45,8 @@ public class FavoriteController {
     }
 
     @GetMapping("/douyin/favorite/list/")
-    public Rest<List<Favorite>> favoriteList(@RequestParam("user_id")Long userId, @RequestParam("token") String token){
-        List<Favorite> favoriteListByUid = favoriteService.getFavoriteListByUid(userId, token);
-        return Rest.success(null,"favorite_list",favoriteListByUid);
+    public Rest<List<VideoDTO>> favoriteList(@RequestParam("user_id")Long userId, @RequestParam("token") String token){
+        return favoriteService.getFavoriteListByUid(userId, token);
     }
 
     @GetMapping("/douyin/favorite/is")
