@@ -64,4 +64,19 @@ public class FeedService {
         feedMapper.updateById(video);
         return video;
     }
+
+    public Video commentAction(Long videoId,int action){
+        Video video = feedMapper.selectById(videoId);
+        if (video == null){
+            return null;
+        }
+        if (action == 1){
+            video.setCommentCount(video.getCommentCount() + 1);
+        }else {
+            video.setCommentCount(video.getCommentCount() - 1);
+
+        }
+        feedMapper.updateById(video);
+        return video;
+    }
 }

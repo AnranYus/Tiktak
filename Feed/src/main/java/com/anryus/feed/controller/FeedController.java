@@ -49,4 +49,14 @@ public class FeedController {
             return Rest.fail("");
         }
     }
+
+    @PostMapping("/douyin/feed/comment")
+    public Rest<Object> commentAction(@RequestParam("video_id")Long videoId,@RequestParam("action")int action){
+        Video video = feedService.commentAction(videoId, action);
+        if (video != null){
+            return Rest.success("");
+        }else {
+            return Rest.fail("");
+        }
+    }
 }

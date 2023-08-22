@@ -3,6 +3,7 @@ package com.anryus.comment.service;
 import com.anryus.comment.entity.Comment;
 import com.anryus.comment.entity.dto.CommentDTO;
 import com.anryus.comment.mapper.FavoriteMapper;
+import com.anryus.comment.service.client.FeedClient;
 import com.anryus.comment.service.client.UserClient;
 import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.User;
@@ -26,6 +27,8 @@ public class CommentService {
     JwtUtils jwtUtils;
     @Autowired
     UserClient userClient;
+    @Autowired
+    FeedClient feedClient;
 
     /**
      *
@@ -51,6 +54,7 @@ public class CommentService {
         User user = userInfo.getAttributes().get("user");
 
         if (user != null && insert > 0){
+            feedClient.commentAction(videoId,1);
             return CommentDTO.parse(comment,user);
         }
 
@@ -64,6 +68,7 @@ public class CommentService {
         Comment comment = favoriteMapper.selectById(commentId);
         if (comment.getUserUid() == uid){
             comment.setDeleted(true);
+            feedClient.commentAction(comment.getVideoId(),2);
             return favoriteMapper.updateById(comment);
         }
         return -1;
