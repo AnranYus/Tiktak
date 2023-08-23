@@ -47,5 +47,7 @@ public class User {
     private String username;
     private String password;
     private boolean deleted;
+    //作品数量
+    private long workCount;
 
 }

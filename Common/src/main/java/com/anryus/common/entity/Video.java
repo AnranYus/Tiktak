@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class Video {
 
@@ -63,4 +65,5 @@ public class Video {
     private long userUid;
     private String descripath;
     private boolean deleted;
+    private Date updatetime = new Date();
 }

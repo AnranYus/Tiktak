@@ -3,20 +3,21 @@ package com.anryus.common.entity;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Rest<T> {
 
     /**
      * 状态码，0-成功，其他值-失败
      */
-    private long statusCode;
+    private Integer statusCode;
     /**
      * 返回状态描述
      */
@@ -28,18 +29,18 @@ public class Rest<T> {
     @JsonAnySetter
     private Map<String,T> attributes = new HashMap<>();
 
-    public static byte STATUS_SUCCESS = 0;
-    public static byte STATUS_FAIL = 1;
+    public static Integer STATUS_SUCCESS = 0;
+    public static Integer STATUS_FAIL = 1;
 
     public Rest() {
     }
 
-    public Rest(long statusCode, String statusMsg) {
+    public Rest(Integer statusCode, String statusMsg) {
         this.statusCode = statusCode;
         this.statusMsg = statusMsg;
     }
 
-    public Rest(long statusCode, String statusMsg,Map<String,T> attributes) {
+    public Rest(Integer statusCode, String statusMsg,Map<String,T> attributes) {
         this.statusCode = statusCode;
         this.statusMsg = statusMsg;
         this.attributes.putAll(attributes);

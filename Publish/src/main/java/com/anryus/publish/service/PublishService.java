@@ -42,20 +42,18 @@ public class PublishService {
         this.favoriteClient = favoriteClient;
     }
 
-    public int pushVideo( MultipartFile file,String token, String title){
+    public int pushVideo( MultipartFile file,Long uid, String title){
         //TODO 储存视频
-
-        Map<String, String> map = jwtUtils.verify(token);
-        if (map!=null){
-            long uid = Long.parseLong(map.get("uid"));
 
             Video video = new Video(file.getOriginalFilename(),file.getOriginalFilename(),title,uid,null);
             video.setVideoId(SnowFlake.Gen(1));
             //TODO SAVE
-            return publishMapper.insert(video);
+            int insert = publishMapper.insert(video);
+            if (insert > 0){
+                userClient.updateUserInfo(uid);
+            }
+            return insert;
 
-        }
-        return -1;
     }
 
     public List<VideoDTO> getVideoList(Long uid){
