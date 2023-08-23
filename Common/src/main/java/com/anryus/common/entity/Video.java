@@ -10,13 +10,14 @@ import java.util.Date;
 @Data
 public class Video {
 
-    public Video(String coverPath, String videoPath, String title, long userUid, String descripath) {
-        this.videoId = SnowFlake.Gen(1);
+    public Video(Long videoId,String coverPath, String videoPath, String title, long userUid, String descripath) {
+        this.videoId = videoId;
         this.coverUrl = coverPath;
         this.videoUrl = videoPath;
         this.title = title;
         this.userUid = userUid;
         this.descripath = descripath;
+
     }
 
     public Video(long commentCount, String coverUrl, long likeCount, Long videoId, String videoUrl, String title, long userUid, String descripath, boolean deleted) {

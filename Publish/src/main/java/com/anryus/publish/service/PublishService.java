@@ -7,17 +7,19 @@ import com.anryus.common.entity.Video;
 import com.anryus.common.entity.VideoDTO;
 import com.anryus.common.utils.JwtUtils;
 import com.anryus.common.utils.SnowFlake;
+import com.anryus.publish.client.AwsClient;
 import com.anryus.publish.mapper.PublishMapper;
 import com.anryus.publish.service.client.FavoriteClient;
 import com.anryus.publish.service.client.UserClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class PublishService {
@@ -34,6 +36,9 @@ public class PublishService {
     final
     FavoriteClient favoriteClient;
 
+    @Autowired
+    AwsClient awsClient;
+
     public PublishService(UserClient userClient, PublishMapper publishMapper, StringRedisTemplate template, JwtUtils jwtUtils, FavoriteClient favoriteClient) {
         this.userClient = userClient;
         this.publishMapper = publishMapper;
@@ -43,16 +48,26 @@ public class PublishService {
     }
 
     public int pushVideo( MultipartFile file,Long uid, String title){
-        //TODO 储存视频
 
-            Video video = new Video(file.getOriginalFilename(),file.getOriginalFilename(),title,uid,null);
-            video.setVideoId(SnowFlake.Gen(1));
-            //TODO SAVE
-            int insert = publishMapper.insert(video);
-            if (insert > 0){
-                userClient.updateUserInfo(uid);
-            }
-            return insert;
+        int result = -1;
+        Long id = SnowFlake.Gen(1);
+        String url = "";
+        try {
+             url = awsClient.upload(String.valueOf(id), file, file.getInputStream());
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Video video = new Video(id,"null",url,title,uid,null);
+
+        video.setVideoId(id);
+
+        result = publishMapper.insert(video);
+        if (result > 0){
+            userClient.updateUserInfo(uid);
+        }
+        return result;
 
     }
 
@@ -69,11 +84,6 @@ public class PublishService {
         }
 
         return videoDTOS;
-    }
-
-    //TODO 保存上传视频
-    public String save(MultipartFile file){
-        return file.getOriginalFilename();
     }
 
     public Video getVideoById(Long videoId){

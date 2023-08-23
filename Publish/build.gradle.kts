@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation("software.amazon.awssdk:s3:2.20.131")
     implementation("org.springframework.cloud:spring-cloud-loadbalancer:4.0.4")
     implementation("mysql:mysql-connector-java:8.0.33")
 
