@@ -3,30 +3,44 @@ package com.anryus.publish.controller;
 import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.Video;
 import com.anryus.common.entity.VideoDTO;
+import com.anryus.common.utils.JwtUtils;
 import com.anryus.publish.service.PublishService;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
 @ResponseBody
 public class PublishController {
     final PublishService service;
+    final JwtUtils jwtUtils;
 
-    public PublishController(PublishService service) {
+    public PublishController(PublishService service, JwtUtils jwtUtils) {
         this.service = service;
+        this.jwtUtils = jwtUtils;
     }
     @PostMapping("/douyin/publish/action/")
-    public Rest<Object> publishVideo(@RequestParam("file") MultipartFile file, @RequestParam("token")String token, @RequestParam("title")String title){
-        int i = service.pushVideo(file,token,title);
-        if (i>0){
-            return Rest.success("成功");
-        }else {
-            return Rest.fail("失败");
+    public Rest<Object> publishVideo(MultipartFile data, String token, String title){
+
+        Map<String, String> verify = jwtUtils.verify(token);
+        String s = verify.get("uid");
+        if (s != null){
+
+            long uid = Long.parseLong(s);
+
+            int i = service.pushVideo(data,uid,title);
+            if (i>0){
+                return Rest.success("成功");
+            }else {
+                return Rest.fail("失败");
+            }
         }
+        return Rest.fail("拒绝访问");
+
     }
 
     @GetMapping("/douyin/publish/list/")

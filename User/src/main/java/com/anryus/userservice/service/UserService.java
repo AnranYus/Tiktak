@@ -127,4 +127,16 @@ public class UserService {
 
     }
 
+    public User updateWorkCount(Long uid){
+        User user =  userMapper.selectById(uid);
+        if (user!= null){
+            user.setWorkCount(user.getWorkCount() + 1);
+            userMapper.updateById(user);
+            return userMapper.selectById(user.getUid());
+        }
+
+
+        return null;
+    }
+
 }

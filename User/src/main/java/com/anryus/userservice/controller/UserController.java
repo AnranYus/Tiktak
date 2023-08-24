@@ -83,6 +83,17 @@ public class UserController {
         }
     }
 
+    @PostMapping("/douyin/user/work_count")
+    public Rest<User> updateUserInfo(@RequestHeader("user_id")Long uid){
+
+        User user = userService.updateWorkCount(uid);
+        if (user!=null){
+            return Rest.success("","user",user);
+        }else {
+            return Rest.fail("");
+        }
+    }
+
 
 
 }
