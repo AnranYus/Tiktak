@@ -42,6 +42,12 @@ public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> implem
             token.set(request.getQueryParams().getFirst("token"));
             if (token.get() != null && !Objects.equals(token.get(), "")){
                 Map<String, String> verify = jwtUtils.verify(token.get());
+
+                //验证不通过
+                if (verify.get("reject")!=null){
+                    return doReject(exchange);
+                }
+
                 String uid = verify.get("uid");
                 request.mutate().header("user-id",uid).build();
                 return chain.filter(exchange.mutate().request(request).build());
