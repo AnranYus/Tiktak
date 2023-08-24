@@ -4,8 +4,6 @@ package com.anryus.userservice.utils;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
-import com.auth0.jwt.interfaces.RSAKeyProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +12,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class Jwt {
@@ -46,9 +42,16 @@ public class Jwt {
             Map<String,String> map = new HashMap<>();
             map.put("uid",String.valueOf(uid));
             map.put("rule",rule);
+            Date now = new Date();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(now);
+            cal.add(Calendar.DAY_OF_MONTH,7);
+
+
             String token = JWT.create()
                     .withIssuer("auth0")
                     .withPayload(map)
+                    .withExpiresAt(cal.getTime())//7天后过期
                     .sign(algorithm);
             saveInRedis(uid,token);
             return token;
