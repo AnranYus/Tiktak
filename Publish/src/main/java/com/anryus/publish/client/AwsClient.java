@@ -2,9 +2,12 @@ package com.anryus.publish.client;
 
 import com.alibaba.nacos.common.codec.Base64;
 import com.alibaba.nacos.common.utils.StringUtils;
+import com.anryus.publish.exception.CanNotUploadException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
@@ -33,8 +36,10 @@ public class AwsClient {
     private static final ExecutorService executor = Executors.newFixedThreadPool(16);
 
     private static final String BUCKETNAME = "tiktak-demo";
-    public AwsClient() {
+    final RabbitTemplate rabbitTemplate;
+    public AwsClient(RabbitTemplate rabbitTemplate) {
         client = createS3Client();
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public static S3Client createS3Client() {
@@ -63,6 +68,9 @@ public class AwsClient {
         }
 
         Runnable task =  new Runnable(){
+            private static int retryCount = 0;
+            private static final int maxRetryCount = 3;
+
             @Override
             public void run() {
 
@@ -88,16 +96,37 @@ public class AwsClient {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+
+                try {
+                    PutObjectResponse putObjectResponse = doPut(objectRequest, requestBody);
+                    logger.info("Upload success: "+putObjectResponse.toString());
+                }catch (CanNotUploadException e){
+                    logger.error("Upload fail: "+e.getMessage());
+                    //发送回滚消息
+                    rabbitTemplate.convertAndSend(objectKey);
+                }
+
+            }
+
+            private PutObjectResponse doPut(PutObjectRequest por ,RequestBody req)throws CanNotUploadException {
                 PutObjectResponse putObjectResponse;
                 try {
-                    putObjectResponse = client.putObject(objectRequest, requestBody);
-                    logger.info("Upload success: "+putObjectResponse.toString());
+                    putObjectResponse = client.putObject(por, req);
+
 
                 }catch (AwsServiceException e){
-                    logger.error("Upload fail: "+e.getMessage());
-                    //TODO 数据表回滚 消息队列
-
+                    logger.error("Upload retry: "+e.getMessage());
+                    if (retryCount <= maxRetryCount){
+                        //重试四次
+                        retryCount++;
+                        putObjectResponse = doPut(por, req);
+                    }else {
+                        throw new CanNotUploadException();
+                    }
                 }
+
+                return putObjectResponse;
+
             }
         };
 
@@ -107,6 +136,8 @@ public class AwsClient {
 
         return url.toString();
     }
+
+
 
 
     public boolean doesObjectExist(String objectKey) {
