@@ -55,7 +55,7 @@ public class JwtUtils {
                     map.put("rule",rule);
 
                 } catch (JWTVerificationException exception) {
-                    exception.printStackTrace();
+                    map.put("reject","true");
                 }
 
             } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
