@@ -53,7 +53,7 @@ public class Jwt {
                     .withPayload(map)
                     .withExpiresAt(cal.getTime())//7天后过期
                     .sign(algorithm);
-            saveInRedis(uid,token);
+            saveInRedis(uid,token,cal.getTime());
             return token;
         } catch (JWTCreationException exception){
             exception.printStackTrace();
@@ -61,11 +61,13 @@ public class Jwt {
         return null;
     }
 
-    private void saveInRedis(long uid,String token){
+    private void saveInRedis(long uid,String token,Date date){
         byte[] publicKeyBytes = rsaPublicKey.getEncoded();
         byte[] privateKeyBytes = rsaPrivateKey.getEncoded();
-        template.opsForValue().set(String.valueOf(uid),token);
-        template.opsForValue().set(token, Base64.getEncoder().encodeToString(publicKeyBytes)+":"+Base64.getEncoder().encodeToString(privateKeyBytes));
+        template.opsForValue().set(String.valueOf(uid),token,date.getTime());
+        template.opsForValue().set(token,
+                Base64.getEncoder().encodeToString(publicKeyBytes)+":"+Base64.getEncoder().encodeToString(privateKeyBytes),
+                date.getTime());
     }
 
     public String getToken(long uid){
