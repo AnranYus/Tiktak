@@ -46,7 +46,7 @@ public class UserController {
         User user = userService.register(username, password);
 
         if (user == null){
-            return Rest.fail("已经存在改用户");
+            return Rest.fail("已经存在该用户");
         }
 
         return userService.createToken(user.getUid(),"user");
