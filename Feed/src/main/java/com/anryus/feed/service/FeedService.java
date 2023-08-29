@@ -30,7 +30,7 @@ public class FeedService {
     }
 
     //获取视频列表
-    public List<VideoDTO> getVideoByLatestTime(Long time, String token){
+    public List<VideoDTO> getVideoByLatestTime(Long time, long requestUid){
         Date date = new Date(time);
         QueryWrapper<Video> queryWrapper = new QueryWrapper<>();
         queryWrapper.le("updatetime",date).eq("deleted",false);
@@ -38,11 +38,11 @@ public class FeedService {
         List<VideoDTO> result = new ArrayList<>();
         for (Video video : videos) {
             long uid = video.getUserUid();
-            Rest<User> userInfo = userClient.getUserInfo(uid, token);
-            logger.info(userInfo.toString());
+            Rest<User> userInfo = userClient.getUserInfo(uid,null);
             boolean favorite = false;
-            if (token!=null){
-                favorite = favoriteClient.isFavorite(0L, video.getVideoId(), token);
+
+            if (requestUid!=0){
+                favorite = favoriteClient.isFavorite(0L, video.getVideoId(), requestUid);
             }
 
             VideoDTO dto = VideoDTO.parseVideoDTO(video,userInfo.getAttributes().get("user"),favorite );

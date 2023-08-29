@@ -23,17 +23,16 @@ public class UserController {
 
 
     @GetMapping("/douyin/user/")
-    public Rest<User> getUserInfo(@RequestParam("user_id") long uid, @RequestParam("token")@Nullable String token){
-        if (uid == 0){
-            String uidStr = jwtUtils.verify(token).get("uid");
-            if (uidStr!=null){
-                uid = Long.parseLong(uidStr);
-            }else {
-                return Rest.fail("不存在该用户");
-            }
+    public Rest<User> getUserInfo(@RequestParam("user_id") long uid, @RequestHeader("user-id")@Nullable Long requestUid){
+        long UID = uid;
+
+        if (UID == 0 && requestUid!=null){
+            UID = requestUid;
+        }else {
+            return Rest.fail("获取用户信息失败");
         }
 
-        User userByUid = userService.getUserByUid(uid);
+        User userByUid = userService.getUserByUid(UID);
         if (userByUid != null){
             return Rest.success("成功","user" ,userByUid);
         }else {
@@ -84,7 +83,7 @@ public class UserController {
     }
 
     @PostMapping("/douyin/user/work_count")
-    public Rest<User> updateUserInfo(@RequestHeader("user_id")Long uid){
+    public Rest<User> updateUserInfo(@RequestHeader("user-id")Long uid){
 
         User user = userService.updateWorkCount(uid);
         if (user!=null){

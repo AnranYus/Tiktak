@@ -7,28 +7,28 @@ import com.anryus.comment.service.client.FeedClient;
 import com.anryus.comment.service.client.UserClient;
 import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.User;
-import com.anryus.common.utils.JwtUtils;
 import com.anryus.common.utils.SnowFlake;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class CommentService {
-    @Autowired
+    final
     FavoriteMapper favoriteMapper;
-    @Autowired
-    JwtUtils jwtUtils;
-    @Autowired
+    final
     UserClient userClient;
-    @Autowired
+    final
     FeedClient feedClient;
+
+    public CommentService(FavoriteMapper favoriteMapper, UserClient userClient, FeedClient feedClient) {
+        this.favoriteMapper = favoriteMapper;
+        this.userClient = userClient;
+        this.feedClient = feedClient;
+    }
 
     /**
      *
@@ -75,7 +75,7 @@ public class CommentService {
 
     }
 
-    public List<CommentDTO> getCommentList(String token,long videoId){
+    public List<CommentDTO> getCommentList(long videoId){
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("video_id",videoId).eq("deleted",false);
         List<Comment> comments = favoriteMapper.selectList(queryWrapper);
