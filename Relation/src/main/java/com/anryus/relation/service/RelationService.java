@@ -3,13 +3,11 @@ package com.anryus.relation.service;
 import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.User;
 import com.anryus.common.entity.UserDTO;
-import com.anryus.common.utils.JwtUtils;
 import com.anryus.common.utils.SnowFlake;
 import com.anryus.relation.entity.Relation;
 import com.anryus.relation.mapper.RelationMapper;
 import com.anryus.relation.service.client.UserClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,16 +19,11 @@ public class RelationService {
     final
     RelationMapper relationMapper;
 
-    final
-    JwtUtils jwtUtils;
-
-    final
-    UserClient userClient;
+    final UserClient userClient;
 
 
-    public RelationService(RelationMapper relationMapper, JwtUtils jwtUtils, UserClient userClient) {
+    public RelationService(RelationMapper relationMapper, UserClient userClient) {
         this.relationMapper = relationMapper;
-        this.jwtUtils = jwtUtils;
         this.userClient = userClient;
     }
 

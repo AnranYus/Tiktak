@@ -18,8 +18,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
@@ -27,9 +26,13 @@ public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> implem
 
     final
     JwtUtils jwtUtils;
+    private static final Map<String,Boolean> allowMap = new HashMap<>();
+
 
     public AuthorizeFilter(JwtUtils jwtUtils) {
         this.jwtUtils = jwtUtils;
+        allowMap.put("/douyin/feed/",true);
+        allowMap.put("/douyin/user/",true);
     }
 
     @Override
@@ -51,6 +54,10 @@ public class AuthorizeFilter extends AbstractGatewayFilterFactory<Object> implem
                 String uid = verify.get("uid");
                 request.mutate().header("user-id",uid).build();
                 return chain.filter(exchange.mutate().request(request).build());
+            }
+
+            if (allowMap.get(request.getPath().toString())){
+                return chain.filter(exchange);
             }
 
 

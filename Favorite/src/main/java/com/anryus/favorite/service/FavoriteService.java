@@ -3,7 +3,6 @@ package com.anryus.favorite.service;
 import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.Video;
 import com.anryus.common.entity.VideoDTO;
-import com.anryus.common.utils.JwtUtils;
 import com.anryus.common.utils.SnowFlake;
 import com.anryus.common.entity.Favorite;
 import com.anryus.favorite.mapper.FavoriteMapper;
@@ -23,7 +22,6 @@ public class FavoriteService {
 
     final
     FavoriteMapper favoriteMapper;
-    final JwtUtils jwtUtils;
 
     final
     PublishClient publishClient;
@@ -32,38 +30,32 @@ public class FavoriteService {
     FeedClient feedClient;
 
 
-    public FavoriteService(FavoriteMapper favoriteMapper, JwtUtils jwtUtils, PublishClient publishClient, FeedClient feedClient) {
+    public FavoriteService(FavoriteMapper favoriteMapper, PublishClient publishClient, FeedClient feedClient) {
         this.favoriteMapper = favoriteMapper;
-        this.jwtUtils = jwtUtils;
         this.publishClient = publishClient;
         this.feedClient = feedClient;
     }
 
-    public int actionFavorite(String token,long videoId,int actionType){
+    public int actionFavorite(long uid,long videoId,int actionType){
         Rest<Video> video = publishClient.getVideo(videoId);
         if (video.getStatusCode() != 0) {
             //没有该视频，非法操作
             return -1;
         }
 
-        String s = jwtUtils.verify(token).get("uid");
-        long UID = -1;
-        if (s != null){
-            UID = Long.parseLong(s);
-        }
 
         int result = -1;
 
 
 
         Favorite favorite = new Favorite();
-        favorite.setUserUid(UID);
+        favorite.setUserUid(uid);
         favorite.setVideoId(videoId);
 
         if (actionType == 1){
 
             QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("user_uid",UID).eq("video_id",videoId).eq("deleted",true);
+            queryWrapper.eq("user_uid", uid).eq("video_id",videoId).eq("deleted",true);
             Favorite exites = favoriteMapper.selectOne(queryWrapper);
             if (exites != null){
                 //存在被删除的项，恢复
@@ -80,7 +72,7 @@ public class FavoriteService {
 
             //更新为不喜欢
             UpdateWrapper<Favorite> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("user_uid",UID).eq("video_id",videoId).eq("deleted",false).set("deleted",true);
+            updateWrapper.eq("user_uid", uid).eq("video_id",videoId).eq("deleted",false).set("deleted",true);
             favorite.setDeleted(true);
             result = favoriteMapper.update(favorite,updateWrapper);
         }
@@ -92,10 +84,10 @@ public class FavoriteService {
         return result;
     }
 
-    public Rest<List<VideoDTO>> getFavoriteListByUid(Long uid, String token){
+    public Rest<List<VideoDTO>> getFavoriteListByUid(Long uid, long requestUid){
         long userId = uid;
         if (userId <= 0){
-            userId = Long.parseLong(jwtUtils.verify(token).get("uid"));
+            userId = requestUid;
         }
 
         QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
@@ -104,17 +96,14 @@ public class FavoriteService {
         return feedClient.favoriteVideos(favorites);
     }
 
-    public boolean isFavorite(long userId,String token,Long videoId){
-        long uid = userId;
+    public boolean isFavorite(long uid,long requestUid,Long videoId){
+        long userId = uid;
         if (userId <=0){
-            String str = jwtUtils.verify(token).get("uid");
-            if (str != null){
-                uid = Long.parseLong(str);
-            }
+            userId = requestUid;
         }
 
         QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_uid",uid).eq("video_id",videoId).eq("deleted",false);
+        queryWrapper.eq("user_uid",userId).eq("video_id",videoId).eq("deleted",false);
         Favorite favorite = favoriteMapper.selectOne(queryWrapper);
         return favorite != null;
 

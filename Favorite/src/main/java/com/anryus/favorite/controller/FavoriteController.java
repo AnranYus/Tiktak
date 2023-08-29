@@ -2,9 +2,7 @@ package com.anryus.favorite.controller;
 
 import com.anryus.common.entity.Rest;
 import com.anryus.common.entity.VideoDTO;
-import com.anryus.common.utils.JwtUtils;
 import com.anryus.favorite.service.FavoriteService;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,26 +15,24 @@ public class FavoriteController {
 
     final
     FavoriteService favoriteService;
-    final
-    JwtUtils jwtUtils;
 
-    public FavoriteController(FavoriteService favoriteService, JwtUtils jwtUtils) {
+
+    public FavoriteController(FavoriteService favoriteService) {
         this.favoriteService = favoriteService;
-        this.jwtUtils = jwtUtils;
     }
 
     @PostMapping("/douyin/favorite/action/")
-    public Rest<Object> favoriteAction(@RequestParam("token")String token, @RequestParam("video_id")long videoId, @RequestParam("action_type")int actionType){
+    public Rest<Object> favoriteAction(@RequestHeader("user-id")long requestUid, @RequestParam("video_id")long videoId, @RequestParam("action_type")int actionType){
 
         if (actionType == 1) {
-            boolean favorite = favoriteService.isFavorite(0, token, videoId);
+            boolean favorite = favoriteService.isFavorite(0, requestUid, videoId);
 
             if (favorite) {
                 return Rest.fail("已经喜欢过了");
             }
         }
 
-        int i = favoriteService.actionFavorite(token, videoId, actionType);
+        int i = favoriteService.actionFavorite(requestUid, videoId, actionType);
         if (i == -1){
             return Rest.fail("操作失败");
         }
@@ -45,13 +41,13 @@ public class FavoriteController {
     }
 
     @GetMapping("/douyin/favorite/list/")
-    public Rest<List<VideoDTO>> favoriteList(@RequestParam("user_id")Long userId, @RequestParam("token") String token){
-        return favoriteService.getFavoriteListByUid(userId, token);
+    public Rest<List<VideoDTO>> favoriteList(@RequestParam("user_id")Long userId, @RequestHeader("user-id")long requestUid){
+        return favoriteService.getFavoriteListByUid(userId, requestUid);
     }
 
     @GetMapping("/douyin/favorite/is")
-    public boolean isFavorite(@RequestParam("user_id")Long userId,@RequestParam("video_id") Long videoId,@RequestParam("token")@Nullable String token){
-        return favoriteService.isFavorite(userId, token, videoId);
+    public boolean isFavorite(@RequestParam("user_id")Long userId,@RequestParam("video_id") Long videoId, @RequestHeader("user-id")long requestUid){
+        return favoriteService.isFavorite(userId, requestUid, videoId);
     }
 
 }

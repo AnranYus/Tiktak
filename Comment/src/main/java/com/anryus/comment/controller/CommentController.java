@@ -1,11 +1,9 @@
 package com.anryus.comment.controller;
 
 
-import com.anryus.comment.entity.Comment;
 import com.anryus.comment.entity.dto.CommentDTO;
 import com.anryus.comment.service.CommentService;
 import com.anryus.common.entity.Rest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +13,12 @@ import java.util.List;
 @ResponseBody
 public class CommentController {
 
-    @Autowired
+    final
     CommentService commentService;
+
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
 
     @PostMapping("/douyin/comment/action/")
     public Rest<CommentDTO> postComment(@RequestHeader("user-id")Long uid , @RequestParam("video_id")long videoId, @RequestParam("action_type")int actionType, @RequestParam("comment_text")@Nullable String content, @RequestParam("comment_id")@Nullable Long commentId){
@@ -51,8 +53,8 @@ public class CommentController {
     }
 
     @GetMapping("/douyin/comment/list/")
-    public Rest<List<CommentDTO>> commentList(@RequestParam("token")String token, @RequestParam("video_id")long videoId ){
-        List<CommentDTO> commentList = commentService.getCommentList(token, videoId);
+    public Rest<List<CommentDTO>> commentList(@RequestParam("video_id")long videoId ){
+        List<CommentDTO> commentList = commentService.getCommentList(videoId);
 
         return Rest.success(null,"comment_list",commentList);
     }

@@ -23,7 +23,7 @@ public class FeedController {
     }
 
     @GetMapping("/douyin/feed")
-    public Rest<Object> getUserInfo(@RequestParam("latest_time")@Nullable Long latestTime, @RequestParam("token")@Nullable String token){
+    public Rest<Object> getUserInfo(@RequestParam("latest_time")@Nullable Long latestTime, @RequestHeader("user-id")@Nullable long requestUid){
         long time;
         if (latestTime == null || latestTime == 0){
             Date date = new Date();
@@ -31,7 +31,7 @@ public class FeedController {
         }else {
             time = latestTime;
         }
-        List<VideoDTO> videoByLatestTime = feedService.getVideoByLatestTime(time, token);
+        List<VideoDTO> videoByLatestTime = feedService.getVideoByLatestTime(time, requestUid);
         Map<String,Object> map = new HashMap<>();
         map.put("next_time",time);
         map.put("video_list",videoByLatestTime);

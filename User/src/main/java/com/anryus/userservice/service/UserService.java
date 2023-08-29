@@ -43,7 +43,6 @@ public class UserService {
     }
 
     public User register(String username,String password){
-        //TODO 验证用户名是否已经存在
 
         User userByUsername = findUserByUsername(username);
         if (userByUsername!=null){
