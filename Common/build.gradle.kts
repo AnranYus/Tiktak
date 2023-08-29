@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    implementation("com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config:2022.0.0.0")
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.4")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.3")
     implementation("com.baomidou:mybatis-plus-boot-starter:3.5.3.2")
     implementation("org.springframework.boot:spring-boot-starter-data-redis:3.0.6")
