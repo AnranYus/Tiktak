@@ -1,44 +1,45 @@
 package com.anryus.userservice.utils;
 
 
+import com.anryus.common.config.CommonConfig;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class Jwt {
 
     final
     StringRedisTemplate template;
-
-    private final RSAPublicKey rsaPublicKey;
-    private final RSAPrivateKey rsaPrivateKey;
-    public Jwt(StringRedisTemplate template) {
-        KeyPairGenerator keyGen = null;
-        try {
-            keyGen = KeyPairGenerator.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        keyGen.initialize(2048); // 设置密钥长度
-        KeyPair keyPair = keyGen.generateKeyPair();
-        this.rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
-        this.rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
+    final CommonConfig commonConfig;
+    public Jwt(StringRedisTemplate template, CommonConfig commonConfig) {
         this.template = template;
+        this.commonConfig = commonConfig;
     }
 
     public String createToken(long uid,String rule){
         try {
-            Algorithm algorithm = Algorithm.RSA256(rsaPublicKey, rsaPrivateKey);
+            char[] password = commonConfig.getJksPassword().toCharArray();
+            String keyPath = commonConfig.getJksKeyPath();
+
+            KeyStore keyStore = KeyStore.getInstance("JKS");
+            keyStore.load(new FileInputStream(keyPath),password);
+
+            RSAPrivateKey  privateKey  = (RSAPrivateKey) keyStore.getKey(commonConfig.getJksAlias(),password);
+            RSAPublicKey publicKey = (RSAPublicKey) keyStore.getCertificate(commonConfig.getJksAlias()).getPublicKey();
+
+            Algorithm algorithm = Algorithm.RSA256(publicKey,privateKey);
             Map<String,String> map = new HashMap<>();
             map.put("uid",String.valueOf(uid));
             map.put("rule",rule);
@@ -53,21 +54,19 @@ public class Jwt {
                     .withPayload(map)
                     .withExpiresAt(cal.getTime())//7天后过期
                     .sign(algorithm);
-            saveInRedis(uid,token,cal.getTime());
+            saveInRedis(uid,token);
             return token;
         } catch (JWTCreationException exception){
             exception.printStackTrace();
+        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException |
+                 UnrecoverableKeyException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }
 
-    private void saveInRedis(long uid,String token,Date date){
-        byte[] publicKeyBytes = rsaPublicKey.getEncoded();
-        byte[] privateKeyBytes = rsaPrivateKey.getEncoded();
-        template.opsForValue().set(String.valueOf(uid),token,date.getTime());
-        template.opsForValue().set(token,
-                Base64.getEncoder().encodeToString(publicKeyBytes)+":"+Base64.getEncoder().encodeToString(privateKeyBytes),
-                date.getTime());
+    private void saveInRedis(long uid,String token){
+        template.opsForValue().set(String.valueOf(uid),token,7,TimeUnit.DAYS);
     }
 
     public String getToken(long uid){
