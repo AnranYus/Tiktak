@@ -28,8 +28,6 @@ public class UserController {
 
         if (UID == 0 && requestUid!=null){
             UID = requestUid;
-        }else {
-            return Rest.fail("获取用户信息失败");
         }
 
         User userByUid = userService.getUserByUid(UID);
