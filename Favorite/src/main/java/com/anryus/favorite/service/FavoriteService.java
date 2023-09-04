@@ -96,14 +96,14 @@ public class FavoriteService {
         return feedClient.favoriteVideos(favorites);
     }
 
-    public boolean isFavorite(long uid,long requestUid,Long videoId){
-        long userId = uid;
-        if (userId <=0){
-            userId = requestUid;
+    public boolean isFavorite(long uid,Long videoId){
+
+        if (uid <=0){
+            return false;
         }
 
         QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_uid",userId).eq("video_id",videoId).eq("deleted",false);
+        queryWrapper.eq("user_uid", uid).eq("video_id",videoId).eq("deleted",false);
         Favorite favorite = favoriteMapper.selectOne(queryWrapper);
         return favorite != null;
 

@@ -25,7 +25,7 @@ public class FavoriteController {
     public Rest<Object> favoriteAction(@RequestHeader("user-id")long requestUid, @RequestParam("video_id")long videoId, @RequestParam("action_type")int actionType){
 
         if (actionType == 1) {
-            boolean favorite = favoriteService.isFavorite(0, requestUid, videoId);
+            boolean favorite = favoriteService.isFavorite(requestUid, videoId);
 
             if (favorite) {
                 return Rest.fail("已经喜欢过了");
@@ -46,8 +46,8 @@ public class FavoriteController {
     }
 
     @GetMapping("/douyin/favorite/is")
-    public boolean isFavorite(@RequestParam("user_id")Long userId,@RequestParam("video_id") Long videoId, @RequestHeader("user-id")long requestUid){
-        return favoriteService.isFavorite(userId, requestUid, videoId);
+    public boolean isFavorite(@RequestParam("user_id")Long userId,@RequestParam("video_id") Long videoId){
+        return favoriteService.isFavorite(userId, videoId);
     }
 
 }
