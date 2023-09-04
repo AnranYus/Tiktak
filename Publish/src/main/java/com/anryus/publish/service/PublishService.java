@@ -79,7 +79,7 @@ public class PublishService {
         for (Video item:videos){
             Rest<User> userInfo = userClient.getUserInfo(item.getUserUid(), null);
             VideoDTO videoDTO = VideoDTO.parseVideoDTO(item,userInfo.getAttributes().get("user"),
-                    favoriteClient.isFavorite(uid,item.getVideoId(),null));
+                    favoriteClient.isFavorite(uid,item.getVideoId()));
             videoDTOS.add(videoDTO);
         }
 
