@@ -54,7 +54,6 @@ public class Jwt {
                     .withPayload(map)
                     .withExpiresAt(cal.getTime())//7天后过期
                     .sign(algorithm);
-            saveInRedis(uid,token);
             return token;
         } catch (JWTCreationException exception){
             exception.printStackTrace();
@@ -67,9 +66,5 @@ public class Jwt {
 
     private void saveInRedis(long uid,String token){
         template.opsForValue().set(String.valueOf(uid),token,7,TimeUnit.DAYS);
-    }
-
-    public String getToken(long uid){
-        return template.opsForValue().get(String.valueOf(uid));
     }
 }
