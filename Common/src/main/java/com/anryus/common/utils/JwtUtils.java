@@ -56,18 +56,13 @@ public class JwtUtils {
                         .withIssuer("auth0")
                         .build();
                 decodedJWT = verifier.verify(token);
+
                 Map<String, Claim> claims = decodedJWT.getClaims();
                 String uidStr = claims.get("uid").asString();
-                String s = template.opsForValue().get(uidStr);
 
-                if (StringUtils.isNotEmpty(s) && StringUtils.equals(s, token)){
-                    String rule = claims.get("rule").asString();
-                    map.put("uid",uidStr);
-                    map.put("rule",rule);
-                }else {
-                    throw new JWTVerificationException("未找到token");
-                }
-
+                String rule = claims.get("rule").asString();
+                map.put("uid",uidStr);
+                map.put("rule",rule);
 
             } catch (JWTVerificationException exception) {
                 map.put("reject","true");
