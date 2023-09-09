@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("org.springframework.boot") version "3.0.6"
 }
 
 group = "com.anryus"
@@ -17,4 +18,9 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.bootJar{
+    enabled = true
+    mainClass.set("com.anryus.message.MessageApplication")
 }
