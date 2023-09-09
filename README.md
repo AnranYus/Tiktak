@@ -1,3 +1,19 @@
+# Build
+
+```shell
+gradle bootJar
+```
+
+# Run
+```shell
+bash run.sh
+```
+or
+```shell
+java -jar [module]/build/libs/[jar-name].jar
+```
+
+# TODO
 - [x] 基本功能
 - [x] 网关
 - [x] 发现服务
