@@ -21,8 +21,3 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
-
-tasks.bootJar{
-    enabled = true
-    mainClass.set("com.anryus.userservice.UserServiceApplication")
-}

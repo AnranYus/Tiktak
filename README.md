@@ -1,16 +1,24 @@
-# Build
+# 环境
+Redis,MySQL,RabbitMQ,Nacos
 
+若使用keystore则需在配置中心配置`jks.password` `jks.key-path` `jks.alias`字段
+
+否则需修改`Common/config/CommonConfig`相关配置
+
+# Build
 ```shell
 gradle bootJar
 ```
 
-# Run
+产物在`build/target/`内
+
+# Boot
 ```shell
-bash run.sh
+bash boot.sh
 ```
 or
 ```shell
-java -jar [module]/build/libs/[jar-name].jar
+java -jar build/target/xxx.jar
 ```
 
 # TODO
@@ -19,5 +27,3 @@ java -jar [module]/build/libs/[jar-name].jar
 - [x] 发现服务
 - [x] 配置中心
 - [x] 视频存储
-- [ ] 数据一致性(TODO: 上mq)
-- [ ] 细节处理(频繁访问、查后更新)

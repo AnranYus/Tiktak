@@ -26,8 +26,3 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
-
-tasks.bootJar{
-    enabled = true
-    mainClass.set("com.anyus.gateway.GatewayApplication")
-}
